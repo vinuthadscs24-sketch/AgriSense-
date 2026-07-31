@@ -42,8 +42,8 @@ class DiseaseRequest(BaseModel):
 class AdvisoryRequest(BaseModel):
     disease: str
     confidence: float
-    weather: str        # e.g., "Heavy rain expected tomorrow"
-    price_trend: str    # e.g., "Prices expected to rise 5% over 3 days"
+    # weather: str        # e.g., "Heavy rain expected tomorrow"
+    # price_trend: str    # e.g., "Prices expected to rise 5% over 3 days"
     perishability: str  # e.g., "High", "Medium", "Low"
 
 
