@@ -1,28 +1,5 @@
 import os
 import json
-<<<<<<< HEAD
-import numpy as np  # type: ignore[reportMissingImports]
-from fastapi import FastAPI, UploadFile, File, HTTPException  # type: ignore[reportMissingImports]
-from fastapi.middleware.cors import CORSMiddleware  # type: ignore[reportMissingImports]
-from pydantic import BaseModel  # type: ignore[reportMissingImports]
-from google import genai  # type: ignore[reportMissingImports]
-from google.genai import types  # type: ignore[reportMissingImports]
-
-
-def load_dotenv():
-    """Load environment variables from the backend .env file if present."""
-    env_path = os.path.join(os.path.dirname(__file__), ".env")
-    if not os.path.isfile(env_path):
-        return
-
-    with open(env_path, encoding="utf-8") as env_file:
-        for line in env_file:
-            line = line.strip()
-            if not line or line.startswith("#") or "=" not in line:
-                continue
-            key, value = line.split("=", 1)
-            os.environ.setdefault(key.strip(), value.strip().strip("\"'"))
-=======
 import logging
 import numpy as np
 from collections import Counter
@@ -39,7 +16,6 @@ from google.genai.errors import APIError
 # Configure Logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("AgriSense")
->>>>>>> 9b2088f (Fix ChatResponse model in backend and update frontend components)
 
 load_dotenv()
 
@@ -68,16 +44,9 @@ client = genai.Client(api_key=API_KEY) if API_KEY else None
 MODEL_NAME = "gemini-2.5-flash"
 
 LANGUAGE_MAP = {
-    "en": "English",
-    "hi": "Hindi",
-    "kn": "Kannada",
-    "te": "Telugu",
-    "ta": "Tamil",
-    "mr": "Marathi",
-    "bn": "Bengali",
-    "gu": "Gujarati",
-    "pa": "Punjabi",
-    "ml": "Malayalam"
+    "en": "English", "hi": "Hindi", "kn": "Kannada", "te": "Telugu",
+    "ta": "Tamil", "mr": "Marathi", "bn": "Bengali", "gu": "Gujarati",
+    "pa": "Punjabi", "ml": "Malayalam"
 }
 
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/heic"}
@@ -100,9 +69,11 @@ class DiseaseRequest(BaseModel):
 
 class AdvisoryRequest(BaseModel):
     disease: str
-    confidence: float = Field(ge=0.0, le=1.0)
-    perishability: str = "High"
-    language: str = "en"
+    confidence: Optional[float] = 0.95
+    weather_risk: Optional[str] = "Moderate Rain expected"
+    market_trend: Optional[str] = "Prices falling"
+    perishability: Optional[str] = "High"
+    language: Optional[str] = "en"
 
 
 class FieldHealthRequest(BaseModel):
@@ -111,8 +82,8 @@ class FieldHealthRequest(BaseModel):
 
 
 class YieldLossRequest(BaseModel):
-    severity_score: float = Field(ge=0.0, le=1.0)
-    affected_percentage: float = Field(ge=0.0, le=100.0)
+    severity_score: float = Field(default=0.5, ge=0.0, le=1.0)
+    affected_percentage: float = Field(default=25.0, ge=0.0, le=100.0)
     language: str = "en"
 
 
@@ -176,10 +147,6 @@ class TranslationResponse(BaseModel):
     translated_text: str
 
 
-class ChatRequest(BaseModel):
-    message: str
-    language: str = "en"
-
 # --- API Endpoints ---
 
 @app.get("/")
@@ -195,7 +162,7 @@ async def diagnose_crop(
     if image.content_type not in ALLOWED_IMAGE_TYPES:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Unsupported image format: {image.content_type}. Allowed formats: {ALLOWED_IMAGE_TYPES}"
+            detail=f"Unsupported image format: {image.content_type}."
         )
     
     try:
@@ -234,7 +201,7 @@ async def diagnose_crop(
     except HTTPException:
         raise
     except (APIError, Exception) as e:
-        logger.warning(f"Fallback triggered for /diagnose due to error/quota limit: {e}")
+        logger.warning(f"Fallback triggered for /diagnose: {e}")
         lang_code = language.lower().strip()
         if lang_code == "kn":
             return {
@@ -243,7 +210,7 @@ async def diagnose_crop(
                 "severity": "ಸಾಧಾರಣ (Medium)",
                 "crop_detected": "ಗೋಧಿ (Wheat)",
                 "is_plant": True,
-                "summary": "ಹಳದಿ ತುಕ್ಕು ಒಂದು ಶಿಲೀಂಧ್ರ ರೋಗವಾಗಿದ್ದು, ಇದು ಎಲೆಗಳ ಮೇಲೆ ಹಳದಿ-ಕಿತ್ತಳೆ ಪಟ್ಟೆಗಳನ್ನು ಸೃಷ್ಟಿಸುತ್ತದೆ ಮತ್ತು ಇಳುವರಿಯನ್ನು ಕಡಿಮೆ ಮಾಡುತ್ತದೆ."
+                "summary": "ಹಳದಿ ತುಕ್ಕು ಒಂದು ಶಿಲೀಂಧ್ರ ರೋಗವಾಗಿದ್ದು, ಇದು ಎಲೆಗಳ ಮೇಲೆ ಹಳದಿ-ಕಿತ್ತಳೆ ಪಟ್ಟೆಗಳನ್ನು ಸೃಷ್ಟಿಸುತ್ತದೆ."
             }
         elif lang_code == "hi":
             return {
@@ -252,7 +219,7 @@ async def diagnose_crop(
                 "severity": "मध्यम (Medium)",
                 "crop_detected": "गेहूं (Wheat)",
                 "is_plant": True,
-                "summary": "पीला रतुआ एक फंगल बीमारी है जो पत्तियों पर पीले-नारंगी धारियां बनाती है और उपज को प्रभावित करती है।"
+                "summary": "पीला रतुआ एक फंगल बीमारी है जो पत्तियों पर पीले-नारंगी धारियां बनाती है।"
             }
         return {
             "disease": "Stripe Rust (Yellow Rust)",
@@ -297,25 +264,25 @@ async def explain_disease(data: DiseaseRequest):
         if lang_code == "kn":
             return {
                 "disease": "ಹಳದಿ ತುಕ್ಕು (Stripe Rust)",
-                "summary": "ಹಳದಿ ತುಕ್ಕು ಗೋಧಿ ಬೆಳೆಯಲ್ಲಿ ಬರುವ ಒಂದು ಶಿಲೀಂಧ್ರ ರೋಗವಾಗಿದ್ದು, ಇದು ದ್ಯುತಿಸಂಶ್ಲೇಷಣೆಯನ್ನು ಕಡಿಮೆ ಮಾಡುತ್ತದೆ.",
-                "symptoms": ["ಎಲೆಗಳ ಮೇಲೆ ಹಳದಿ ಬಣ್ಣದ ರೇಖೆಗಳು ಮತ್ತು ಚುಕ್ಕೆಗಳು", "ಎಲೆಗಳು ಒಣಗಿ ಉದುರುವುದು"],
-                "treatment": ["ಶಿಫಾರಸು ಮಾಡಿದ ಪ್ರೋಪಿಕೋನಜೋಲ್ ಶಿಲೀಂಧ್ರನಾಶಕವನ್ನು ಸಿಂಪಡಿಸಿ", "ಸರಿಯಾದ ನೀರಾವರಿ ನಿರ್ವಹಣೆ ಮಾಡಿ"],
-                "prevention": ["ರೋಗ ನಿರೋಧಕ ತಳಿಗಳನ್ನು ಬಳಸಿ", "ಹೆಚ್ಚುವರಿ ಸಾರಜನಕ ರಸಗೊಬ್ಬರವನ್ನು ತಪ್ಪಿಸಿ"]
+                "summary": "ಹಳದಿ ತುಕ್ಕು ಗೋಧಿ ಬೆಳೆಯಲ್ಲಿ ಬರುವ ಒಂದು ಶಿಲೀಂಧ್ರ ರೋಗವಾಗಿದೆ.",
+                "symptoms": ["ಎಲೆಗಳ ಮೇಲೆ ಹಳದಿ ಬಣ್ಣದ ರೇಖೆಗಳು", "ಎಲೆಗಳು ಒಣಗಿ ಉದುರುವುದು"],
+                "treatment": ["ಶಿಫಾರಸು ಮಾಡಿದ ಪ್ರೋಪಿಕೋನಜೋಲ್ ಸಿಂಪಡಿಸಿ"],
+                "prevention": ["ರೋಗ ನಿರೋಧಕ ತಳಿಗಳನ್ನು ಬಳಸಿ"]
             }
         elif lang_code == "hi":
             return {
                 "disease": "पीला रतुआ (Stripe Rust)",
-                "summary": "पीला रतुआ गेहूं की फसल को प्रभावित करने वाला एक फंगल रोग है जो उपज घटाता है।",
-                "symptoms": ["पत्तियों पर पीली-नारंगी धारियां", "पत्तियों का समय से पहले सूखना"],
-                "treatment": ["अनुशंसित प्रोपिकोनाज़ोल कवकनाशी का छिड़काव करें", "खेत में जल निकासी सुनिश्चित करें"],
-                "prevention": ["रोग प्रतिरोधी किस्मों को बोएं", "अत्यधिक नाइट्रोजन उर्वरक से बचें"]
+                "summary": "पीला रतुआ गेहूं की फसल को प्रभावित करने वाला एक फंगल रोग है।",
+                "symptoms": ["पत्तियों पर पीली-नारंगी धारियां"],
+                "treatment": ["अनुशंसित कवकनाशी का छिड़काव करें"],
+                "prevention": ["रोग प्रतिरोधी किस्मों को बोएं"]
             }
         return {
             "disease": data.disease,
-            "summary": f"{data.disease} affects leaf photosynthesis and reduces overall crop yield if left untreated.",
-            "symptoms": ["Yellow/orange pustules along leaf veins", "Premature leaf drying and chlorosis"],
-            "treatment": ["Apply recommended systemic fungicide spray (e.g. Propiconazole)", "Ensure balanced field drainage"],
-            "prevention": ["Plant resistant crop varieties", "Avoid excessive nitrogen fertilization"]
+            "summary": f"{data.disease} affects leaf photosynthesis and reduces overall crop yield.",
+            "symptoms": ["Yellow/orange pustules along leaf veins"],
+            "treatment": ["Apply recommended systemic fungicide spray"],
+            "prevention": ["Plant resistant crop varieties"]
         }
 
 
@@ -381,9 +348,10 @@ async def sell_hold_advisor(data: AdvisoryRequest):
         Input Context:
         - Disease: {data.disease} (Confidence: {data.confidence})
         - Weather Forecast: {weather['forecast']}
+        - Market Trend: {data.market_trend}
         - Crop Perishability: {data.perishability}
 
-        CRITICAL INSTRUCTION: Write ALL string values (recommendation, risk_level, reasoning, action_steps, whatsapp_broadcast) in {lang_name} ({data.language}).
+        CRITICAL INSTRUCTION: Write ALL string values in {lang_name} ({data.language}).
         """
 
         response = await run_in_threadpool(
@@ -405,7 +373,7 @@ async def sell_hold_advisor(data: AdvisoryRequest):
             return {
                 "recommendation": "ತಕ್ಷಣ ಮಾರಾಟ ಮಾಡಿ (SELL NOW)",
                 "risk_level": "ಹೆಚ್ಚಿನ ಅಪಾಯ (High)",
-                "reasoning": "ಸಕ್ರಿಯ ರೋಗದ ಒತ್ತಡ ಮತ್ತು ಮುಂಬರುವ ಮಳೆಯು ಬೆಳೆಗೆ ಹಾನಿ ಉಂಟುಮಾಡಬಹುದು. ತಕ್ಷಣ ಮಾರಾಟ ಮಾಡುವುದು ಸೂಕ್ತ.",
+                "reasoning": "ಸಕ್ರಿಯ ರೋಗದ ಒತ್ತಡ ಮತ್ತು ಮುಂಬರುವ ಮಳೆಯು ಬೆಳೆಗೆ ಹಾನಿ ಉಂಟುಮಾಡಬಹುದು.",
                 "action_steps": ["ಬೆಳೆದ ಬೆಳೆಯನ್ನು ತಕ್ಷಣ ಕೊಯ್ಲು ಮಾಡಿ", "ಹತ್ತಿರದ ಮಾರುಕಟ್ಟೆಗೆ ಸಾಗಿಸಿ"],
                 "whatsapp_broadcast": "AgriSense ಎಚ್ಚರಿಕೆ: ರೋಗದ ಲಕ್ಷಣ ಹಾಗೂ ಮಳೆಯ ಮುನ್ಸೂಚನೆ ಇರುವುದರಿಂದ ತಕ್ಷಣ ಮಾರಾಟ ಮಾಡಲು ಸಲಹೆ ನೀಡಲಾಗಿದೆ."
             }
@@ -426,76 +394,19 @@ async def sell_hold_advisor(data: AdvisoryRequest):
         }
 
 
-@app.post("/field-health")
-async def field_health(data: FieldHealthRequest):
-    try:
-        total = len(data.results)
-        if total == 0:
-            raise HTTPException(status_code=400, detail="No scan results provided.")
-
-        healthy = sum(1 for r in data.results if r.lower() == "healthy")
-        infected = total - healthy
-        healthy_pct = round((healthy / total) * 100, 2)
-        infected_pct = round((infected / total) * 100, 2)
-        diseases = [r for r in data.results if r.lower() != "healthy"]
-        dominant = Counter(diseases).most_common(1)[0][0] if diseases else "None"
-
-        if not client:
-            raise Exception("Gemini client is not initialized.")
-
-        lang_name = get_language_name(data.language)
-        prompt = f"""
-        Translate this field health summary into {lang_name} ({data.language}):
-        "{healthy_pct}% healthy, {infected_pct}% infected. Dominant issue: {dominant}."
-        
-        Return JSON with key "summary".
-        """
-
-        response = await run_in_threadpool(
-            client.models.generate_content,
-            model=MODEL_NAME,
-            contents=[prompt],
-            config=types.GenerateContentConfig(response_mime_type="application/json")
-        )
-
-        translated_summary = json.loads(response.text).get("summary", f"{healthy_pct}% healthy, {infected_pct}% infected.")
-
-        return {
-            "total_scans": total,
-            "healthy_percentage": healthy_pct,
-            "infected_percentage": infected_pct,
-            "field_health_score": healthy_pct,
-            "dominant_disease": dominant,
-            "summary": translated_summary
-        }
-    except HTTPException:
-        raise
-    except (APIError, Exception) as e:
-        logger.warning(f"Fallback triggered for /field-health: {e}")
-        return {
-            "total_scans": len(data.results),
-            "healthy_percentage": healthy_pct if 'healthy_pct' in locals() else 0.0,
-            "infected_percentage": infected_pct if 'infected_pct' in locals() else 100.0,
-            "field_health_score": healthy_pct if 'healthy_pct' in locals() else 0.0,
-            "dominant_disease": dominant if 'dominant' in locals() else "Unknown",
-            "summary": f"Field Health Summary: Scanned issues detected."
-        }
-
-
 @app.post("/yield-loss")
 async def calculate_yield_loss(data: YieldLossRequest):
+    potential_loss = min(100.0, data.severity_score * data.affected_percentage * 1.1)
+    field_health_score = max(0.0, 100.0 - potential_loss)
+
     try:
-        potential_loss = min(100.0, data.severity_score * data.affected_percentage * 1.1)
-        field_health_score = max(0.0, 100.0 - potential_loss)
-        
         if not client:
             raise Exception("Gemini client is not initialized.")
 
         lang_name = get_language_name(data.language)
-        
         prompt = f"""
         Translate the following status strings into {lang_name} ({data.language}):
-        1. Status: "Moderate Risk" (or "Optimal Health" / "Critical Risk" based on score {field_health_score})
+        1. Status: "Moderate Risk"
         2. Recommendation: "Estimated Yield Loss: ~{round(potential_loss, 1)}%. Status: Moderate Risk."
         """
 
@@ -512,17 +423,15 @@ async def calculate_yield_loss(data: YieldLossRequest):
         res_data = json.loads(response.text)
         return {
             "field_health_score": round(field_health_score, 1),
-            "estimated_yield_loss_percent": round(potential_loss, 1),
+            "estimated_yield_loss_pct": round(potential_loss, 1),
             "status": res_data.get("status", "Moderate Risk"),
             "recommendation": res_data.get("recommendation", f"Estimated Yield Loss: ~{round(potential_loss, 1)}%")
         }
     except (APIError, Exception) as e:
         logger.warning(f"Fallback triggered for /yield-loss: {e}")
-        potential_loss = min(100.0, data.severity_score * data.affected_percentage * 1.1)
-        field_health_score = max(0.0, 100.0 - potential_loss)
         return {
             "field_health_score": round(field_health_score, 1),
-            "estimated_yield_loss_percent": round(potential_loss, 1),
+            "estimated_yield_loss_pct": round(potential_loss, 1),
             "status": "Moderate Risk",
             "recommendation": f"Estimated Yield Loss: ~{round(potential_loss, 1)}%."
         }
@@ -535,7 +444,6 @@ async def get_community_outbreaks(language: str = "en"):
             raise Exception("Gemini client is not initialized.")
 
         lang_name = get_language_name(language)
-        
         prompt = f"""
         Translate this outbreak alert data strictly into {lang_name} ({language}):
         Region: Mandya District / Southern Region
@@ -628,7 +536,7 @@ async def voice_assistant_chat(data: ChatRequest):
         You are AgriSense Companion, an empathetic AI agronomist speaking directly to a farmer.
         Answer their question concisely in 2 short sentences.
         
-        CRITICAL INSTRUCTION: Reply ENTIRELY in {lang_name} ({data.language}). Do NOT use English unless the requested language is English.
+        CRITICAL INSTRUCTION: Reply ENTIRELY in {lang_name} ({data.language}). Do NOT use English unless requested.
         
         Farmer Question: "{data.message}"
         """
@@ -649,3 +557,7 @@ async def voice_assistant_chat(data: ChatRequest):
         elif lang_code == "hi":
             return {"reply": "एग्रीसेंस सहायक अभी व्यस्त है। कृपया कुछ देर बाद पुनः प्रयास करें!"}
         return {"reply": "AgriSense Companion is currently receiving high traffic. Please try asking your question again in a moment!"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
