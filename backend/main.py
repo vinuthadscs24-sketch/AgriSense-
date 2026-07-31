@@ -46,7 +46,8 @@ class AdvisoryRequest(BaseModel):
     # price_trend: str    # e.g., "Prices expected to rise 5% over 3 days"
     perishability: str  # e.g., "High", "Medium", "Low"
 
-
+class FieldHealthRequest(BaseModel):
+    results:list[str]
 # --- API Endpoints ---
 
 @app.get("/")
@@ -192,3 +193,22 @@ async def sell_hold_advisor(data: AdvisoryRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/field-health")
+def field_health(data:FieldHealthRequest):
+
+    healthy = data.results.count("Healthy")
+
+    infected = len(data.results)-healthy
+
+    score = round((healthy/len(data.results))*100)
+
+    return {
+
+        "healthy":healthy,
+
+        "infected":infected,
+
+        "fieldHealth":score
+
+    }
