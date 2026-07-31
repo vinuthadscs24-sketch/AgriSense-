@@ -1,5 +1,6 @@
 import os
 import json
+import numpy as np
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -12,7 +13,7 @@ load_dotenv()
 
 app = FastAPI(
     title="AgriSense AI API",
-    description="AI Engine for Crop Health Diagnosis, Agronomist Advice, and Market Decision Synthesis",
+    description="AI Engine for Crop Health Diagnosis, Agronomist Advice, Price Trends, and Market Decisions",
     version="1.0.0"
 )
 
@@ -37,11 +38,13 @@ client = genai.Client(api_key=api_key)
 
 class DiseaseRequest(BaseModel):
     disease: str
-    crop: str = "Crop"
+    crop: str = "Cotton"
+    language: str = "en"  # Default English, supports 'hi' (Hindi), 'kn' (Kannada), etc.
 
 class AdvisoryRequest(BaseModel):
     disease: str
     confidence: float
+<<<<<<< HEAD
     # weather: str        # e.g., "Heavy rain expected tomorrow"
     # price_trend: str    # e.g., "Prices expected to rise 5% over 3 days"
     perishability: str  # e.g., "High", "Medium", "Low"
@@ -52,6 +55,16 @@ class FieldHealthRequest(BaseModel):
 class TranslateRequest(BaseModel):
     text:str
     language:str
+=======
+    weather: str        # e.g., "Heavy rain expected tomorrow"
+    price_trend: str    # e.g., "Prices expected to fall 8% over 3 days"
+    perishability: str  # e.g., "High", "Medium", "Low"
+
+class ChatRequest(BaseModel):
+    message: str
+    language: str = "en"
+
+>>>>>>> 4f2cd389eb32ce4232cd836c0957b3f312ed2de1
 
 # --- API Endpoints ---
 
@@ -104,8 +117,8 @@ async def diagnose_crop(image: UploadFile = File(...)):
 @app.post("/explain")
 async def explain_disease(data: DiseaseRequest):
     """
-    Module 2: AI Agronomist
-    Takes disease name and crop type, returning structured advice in simple language.
+    Module 2: Multilingual AI Agronomist
+    Takes disease name, crop type, and preferred language to return structured advice.
     """
     try:
         prompt = f"""
@@ -113,11 +126,12 @@ async def explain_disease(data: DiseaseRequest):
         The crop is '{data.crop}' and the detected condition is '{data.disease}'.
         
         Provide advice in simple, actionable, and encouraging language.
+        Write all text in the target language code: '{data.language}' (e.g. 'hi' for Hindi, 'kn' for Kannada, 'en' for English).
         
         Return STRICT JSON format with these exact keys:
         {{
           "disease": "{data.disease}",
-          "summary": "1-2 simple sentences explaining what this condition is.",
+          "summary": "1-2 simple sentences explaining what this condition is in the target language.",
           "symptoms": ["Symptom 1", "Symptom 2"],
           "treatment": ["Immediate treatment step 1", "Immediate treatment step 2"],
           "prevention": ["Prevention tip 1", "Prevention tip 2"]
@@ -159,10 +173,52 @@ def market_trend():
         "trend":trend
     }
 
+@app.get("/price-trend/{crop}")
+def get_price_trend(crop: str):
+    """
+    Module 3: Mandi Price Trend Analytics
+    Simulates historical prices and projects short-term price predictions using regression modeling.
+    """
+    try:
+        days = ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7", "Next Day 1", "Next Day 2", "Next Day 3"]
+        
+        # Determine base price based on crop type
+        crop_lower = crop.lower()
+        if "cotton" in crop_lower:
+            base_price = 6200
+            slope = -75  # Price trend dropping
+        elif "tomato" in crop_lower:
+            base_price = 2800
+            slope = 50   # Price trend rising
+        else:
+            base_price = 4100
+            slope = -30
+
+        # Simple linear regression simulation + random market volatility
+        data = []
+        for i, day in enumerate(days):
+            simulated_price = int(base_price + (i * slope) + np.random.randint(-40, 40))
+            data.append({
+                "day": day,
+                "price": max(1000, simulated_price),
+                "is_forecast": i >= 7
+            })
+
+        return {
+            "crop": crop.capitalize(),
+            "currency": "INR/Quintal",
+            "trend_direction": "FALLING" if slope < 0 else "RISING",
+            "data": data
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/advisor")
 async def sell_hold_advisor(data: AdvisoryRequest):
     """
-    Module 3: Sell/Hold Advisor (Decision Engine)
+    Module 4: Smart Sell/Hold Decision Advisor
     Synthesizes disease status, weather forecast, price trends, and crop perishability.
     """
     try:
@@ -199,6 +255,7 @@ async def sell_hold_advisor(data: AdvisoryRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+<<<<<<< HEAD
 from collections import Counter
 
 @app.post("/field-health")
@@ -281,6 +338,30 @@ Text:
         )
 
         return json.loads(response.text)
+=======
+
+@app.post("/chat")
+async def voice_assistant_chat(data: ChatRequest):
+    """
+    Module 5: Conversational Voice / Text Assistant
+    Answers general farming, crop care, and mandi market questions in simple language.
+    """
+    try:
+        prompt = f"""
+        You are AgriSense AI Companion, an empathetic agronomist speaking directly to a farmer.
+        Answer their question concisely in 2-3 short sentences.
+        
+        User Language: '{data.language}'
+        Farmer Question: "{data.message}"
+        """
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=[prompt]
+        )
+
+        return {"reply": response.text.strip()}
+>>>>>>> 4f2cd389eb32ce4232cd836c0957b3f312ed2de1
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
