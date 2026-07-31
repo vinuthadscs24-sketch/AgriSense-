@@ -1,12 +1,26 @@
 import os
 import json
-import numpy as np
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from dotenv import load_dotenv
-from pydantic import BaseModel
-from google import genai
-from google.genai import types
+import numpy as np  # type: ignore[reportMissingImports]
+from fastapi import FastAPI, UploadFile, File, HTTPException  # type: ignore[reportMissingImports]
+from fastapi.middleware.cors import CORSMiddleware  # type: ignore[reportMissingImports]
+from pydantic import BaseModel  # type: ignore[reportMissingImports]
+from google import genai  # type: ignore[reportMissingImports]
+from google.genai import types  # type: ignore[reportMissingImports]
+
+
+def load_dotenv():
+    """Load environment variables from the backend .env file if present."""
+    env_path = os.path.join(os.path.dirname(__file__), ".env")
+    if not os.path.isfile(env_path):
+        return
+
+    with open(env_path, encoding="utf-8") as env_file:
+        for line in env_file:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            os.environ.setdefault(key.strip(), value.strip().strip("\"'"))
 
 # Load environment variables
 load_dotenv()
@@ -59,6 +73,10 @@ class YieldLossRequest(BaseModel):
     severity_score: float  # Value between 0.0 (Healthy) and 1.0 (Severe)
     affected_percentage: float  # Percentage of field affected (0.0 to 100.0)
 
+
+class ChatRequest(BaseModel):
+    message: str
+    language: str = "en"
 
 # --- API Endpoints ---
 
