@@ -1,0 +1,14 @@
+# Secret Keys & Configs
+.env
+*.env
+
+# Python Artifacts
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Frontend / Node Artifacts
+node_modules/
+dist/
+.vite/
