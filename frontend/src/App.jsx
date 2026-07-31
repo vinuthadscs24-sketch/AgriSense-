@@ -1,192 +1,287 @@
 import React, { useState } from 'react';
-import { diagnoseCrop, explainDisease, getAdvisorDecision, getPriceTrend, sendChatMessage } from './api';
+import './App.css';
+import { 
+  diagnoseCrop, 
+  explainDiagnosis, 
+  getPriceTrend, 
+  getAdvisorRecommendation, 
+  sendChatMessage 
+} from './api';
 
-export default function App() {
+function App() {
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
+  
+  // Diagnosis & Explanation response state
   const [diagnosis, setDiagnosis] = useState(null);
   const [explanation, setExplanation] = useState(null);
-  const [priceTrend, setPriceTrend] = useState(null);
+  
+  // Mandi trends state
+  const [crop, setCrop] = useState('Cotton');
+  const [priceData, setPriceData] = useState(null);
+  
+  // Advisor state
   const [advisorResult, setAdvisorResult] = useState(null);
+  
+  // Chat state
   const [chatQuery, setChatQuery] = useState('');
-  const [chatReply, setChatReply] = useState('');
+  const [chatResponse, setChatResponse] = useState('');
 
-  // 1. Diagnosis Upload Handler
-  const handleImageUpload = async (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (file) {
+      setSelectedFile(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
 
+  const handleDiagnose = async () => {
+    if (!selectedFile) {
+      alert("Please upload a leaf photo first!");
+      return;
+    }
     setLoading(true);
+    setDiagnosis(null);
+    setExplanation(null);
+
     try {
-      const diagData = await diagnoseCrop(file);
-      setDiagnosis(diagData);
+      // Step 1: Send image to FastAPI
+      const diagRes = await diagnoseCrop(selectedFile);
+      setDiagnosis(diagRes);
 
-      const cropName = diagData.crop_detected || "Cotton";
-
-      if (diagData.disease) {
-        // Fetch AI Agronomist Explanation
-        const expData = await explainDisease(diagData.disease, cropName, "en");
-        setExplanation(expData);
+      // Step 2: Fetch agronomist explanation for detected condition
+      if (diagRes && diagRes.disease) {
+        const expRes = await explainDiagnosis(diagRes.disease, diagRes.crop_detected || crop, "en");
+        setExplanation(expRes);
       }
-
-      // Fetch Mandi Price Trend Data
-      const priceData = await getPriceTrend(cropName);
-      setPriceTrend(priceData);
-
     } catch (err) {
-      alert("Error contacting AI Backend: Ensure FastAPI server is running on port 8000!");
+      console.error("Diagnosis error:", err);
+      alert(`Diagnosis Error: ${err.message}`);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
-  // 2. Consult AI Decision Advisor
-  const handleConsultAdvisor = async () => {
-    setLoading(true);
+  const handleFetchPrice = async () => {
     try {
-      const payload = {
-        disease: diagnosis?.disease || "Fungal Leaf Spot",
-        confidence: diagnosis?.confidence || 0.9,
-        weather: "Heavy rainfall forecast tomorrow",
-        price_trend: priceTrend ? `Prices trajectory is ${priceTrend.trend_direction}` : "Prices expected to fall 8% next week",
-        perishability: "High"
-      };
-      const decision = await getAdvisorDecision(payload);
-      setAdvisorResult(decision);
+      const data = await getPriceTrend(crop);
+      setPriceData(data);
     } catch (err) {
-      alert("Error fetching AI decision recommendation!");
+      console.error("Price trend error:", err);
+      alert(`Price Error: ${err.message}`);
     }
-    setLoading(false);
   };
 
-  // 3. Web Speech API Voice Recognition
-  const startVoiceRecognition = () => {
+  const handleGetAdvice = async () => {
+    try {
+      const detectedDisease = diagnosis?.disease || "Fungal Leaf Spot";
+      const conf = diagnosis?.confidence || 0.90;
+      
+      const res = await getAdvisorRecommendation(
+        detectedDisease,
+        conf,
+        "Heavy rain expected tomorrow",
+        "Prices projected to fall 5% over 3 days",
+        "High"
+      );
+      setAdvisorResult(res);
+    } catch (err) {
+      console.error("Advisor error:", err);
+      alert(`Advisor Error: ${err.message}`);
+    }
+  };
+
+  const handleVoiceQuery = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert("Voice input is supported in Google Chrome browser!");
+      alert("Voice input is supported in Google Chrome. Please switch to Chrome!");
       return;
     }
     const recognition = new SpeechRecognition();
     recognition.lang = 'en-IN';
-    recognition.start();
-
     recognition.onresult = async (event) => {
       const transcript = event.results[0][0].transcript;
       setChatQuery(transcript);
-      handleSendMessage(transcript);
+      try {
+        const res = await sendChatMessage(transcript, "en");
+        setChatResponse(res.reply);
+      } catch (err) {
+        console.error("Voice chat error:", err);
+      }
     };
+    recognition.start();
   };
 
-  const handleSendMessage = async (msgText) => {
-    const query = msgText || chatQuery;
-    if (!query) return;
-
-    setLoading(true);
+  const handleTextChat = async (e) => {
+    e.preventDefault();
+    if (!chatQuery.trim()) return;
     try {
-      const res = await sendChatMessage(query, "en");
-      setChatReply(res.reply);
+      const res = await sendChatMessage(chatQuery, "en");
+      setChatResponse(res.reply);
     } catch (err) {
-      alert("Error contacting AI voice assistant!");
+      console.error("Text chat error:", err);
+      alert(`Chat Error: ${err.message}`);
     }
-    setLoading(false);
   };
+
+  // Helper to extract current/latest price from priceData array
+  const currentPrice = priceData?.data?.[0]?.price;
+  const forecastPrice = priceData?.data?.[priceData.data.length - 1]?.price;
 
   return (
-    <div style={{ maxWidth: '850px', margin: '30px auto', fontFamily: 'Arial, sans-serif', padding: '0 20px' }}>
-      <h1 style={{ color: '#15803d', textAlign: 'center' }}>🌱 AgriSense AI Farm Companion</h1>
-      <p style={{ textAlign: 'center', color: '#666' }}>Smart Crop Health Diagnosis, Mandi Price Trends & Market Decision Intelligence</p>
+    <div className="app-container">
+      <header className="header">
+        <div className="logo-badge">🌱 AgriSense AI Platform</div>
+        <h1>AgriSense</h1>
+        <p>AI Engine for Crop Health Diagnosis, Agronomist Advice, Price Trends, and Market Decisions</p>
+      </header>
 
-      {/* 1. Photo Upload Module */}
-      <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
-        <h2>1. Upload Crop Image</h2>
-        <input type="file" accept="image/*" onChange={handleImageUpload} />
-        {loading && <p style={{ color: '#2563eb' }}>⏳ AI Vision & Agronomist Engine processing...</p>}
-      </div>
+      <div className="grid">
+        {/* Module 1: Vision AI Diagnosis */}
+        <div className="card">
+          <h2>📷 1. Vision AI Crop Diagnosis</h2>
+          <p className="card-sub">Upload a leaf photo to receive real-time Gemini vision diagnosis.</p>
+          
+          <div className="upload-box">
+            <input type="file" accept="image/*" onChange={handleFileChange} id="file-input" />
+            <label htmlFor="file-input" className="file-label">
+              {selectedFile ? selectedFile.name : "📷 Choose Plant/Crop Image"}
+            </label>
+          </div>
 
-      {/* 2. Disease Diagnosis & Explanation Module */}
-      {diagnosis && (
-        <div style={{ background: '#f0fdf4', padding: '20px', borderRadius: '12px', border: '1px solid #bbf7d0', marginBottom: '20px' }}>
-          <h2 style={{ color: '#166534' }}>2. Crop Care Diagnosis</h2>
-          <p><strong>Identified Crop:</strong> {diagnosis.crop_detected}</p>
-          <p><strong>Detected Condition:</strong> {diagnosis.disease}</p>
-          <p><strong>Model Confidence:</strong> {(diagnosis.confidence * 100).toFixed(0)}%</p>
+          {preview && <img src={preview} alt="Crop Preview" className="img-preview" />}
 
-          {explanation && (
-            <div style={{ marginTop: '15px', paddingTop: '15px', borderTop: '1px dashed #86efac' }}>
-              <h3>AI Agronomist Explanation</h3>
-              <p>{explanation.summary}</p>
-              
-              <h4>Recommended Treatment Steps:</h4>
-              <ul>
-                {explanation.treatment?.map((step, idx) => <li key={idx}>{step}</li>)}
-              </ul>
+          <button onClick={handleDiagnose} className="btn-primary" disabled={loading}>
+            {loading ? "Analyzing Image..." : "Diagnose Crop Health"}
+          </button>
+
+          {diagnosis && (
+            <div className="result-box">
+              <div className="badge-group">
+                <span className="badge badge-disease">{diagnosis.disease}</span>
+                <span className="badge badge-confidence">
+                  {diagnosis.confidence ? `${(diagnosis.confidence * 100).toFixed(0)}% Confidence` : "Diagnosed"}
+                </span>
+                {diagnosis.severity && (
+                  <span className="badge badge-severity">Severity: {diagnosis.severity}</span>
+                )}
+              </div>
+
+              {explanation && (
+                <div className="explanation-text">
+                  <strong>AI Agronomist Summary:</strong>
+                  <p>{explanation.summary}</p>
+                  
+                  {explanation.treatment && (
+                    <div style={{ marginTop: '0.5rem' }}>
+                      <strong>Recommended Treatments:</strong>
+                      <ul>
+                        {explanation.treatment.map((item, idx) => (
+                          <li key={idx}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
-      )}
 
-      {/* 3. Mandi Price Trend Analytics Module */}
-      {priceTrend && (
-        <div style={{ background: '#eff6ff', padding: '20px', borderRadius: '12px', border: '1px solid #bfdbfe', marginBottom: '20px' }}>
-          <h2 style={{ color: '#1e40af' }}>3. Mandi Market Price Trend ({priceTrend.crop})</h2>
-          <p><strong>Market Direction:</strong> <span style={{ color: priceTrend.trend_direction === 'RISING' ? 'green' : 'red', fontWeight: 'bold' }}>{priceTrend.trend_direction}</span> ({priceTrend.currency})</p>
-
-          <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', padding: '10px 0' }}>
-            {priceTrend.data.map((item, idx) => (
-              <div key={idx} style={{ padding: '10px', borderRadius: '6px', background: item.is_forecast ? '#dbeafe' : '#ffffff', border: '1px solid #93c5fd', minWidth: '70px', textAlign: 'center' }}>
-                <small>{item.day}</small>
-                <br />
-                <strong>₹{item.price}</strong>
-                {item.is_forecast && <div style={{ fontSize: '10px', color: '#2563eb' }}>Forecast</div>}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 4. Smart Market Decision Engine */}
-      {diagnosis && (
-        <div style={{ background: '#faf5ff', padding: '20px', borderRadius: '12px', border: '1px solid #e9d5ff', marginBottom: '20px' }}>
-          <h2 style={{ color: '#6b21a8' }}>4. Smart Sell/Hold Market Advisor</h2>
-          <p>Synthesizing weather forecasts, market prices, and disease severity...</p>
+        {/* Module 2: Mandi Market Price Analytics */}
+        <div className="card">
+          <h2>📊 2. Mandi Price Trend Analytics</h2>
+          <p className="card-sub">Track current prices and regression-projected market trends.</p>
           
-          <button 
-            onClick={handleConsultAdvisor} 
-            style={{ background: '#7e22ce', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}>
-            Consult AI Advisor Engine
+          <div className="form-group">
+            <select value={crop} onChange={(e) => setCrop(e.target.value)} className="select-input">
+              <option value="Cotton">Cotton</option>
+              <option value="Tomato">Tomato</option>
+              <option value="Wheat">Wheat</option>
+              <option value="Rice">Rice</option>
+            </select>
+            <button onClick={handleFetchPrice} className="btn-secondary">View Market Trend</button>
+          </div>
+
+          {priceData && (
+            <div className="price-box">
+              <div className="price-stat">
+                <span>Crop:</span>
+                <strong>{priceData.crop}</strong>
+              </div>
+              <div className="price-stat">
+                <span>Current Price:</span>
+                <strong>₹{currentPrice} {priceData.currency}</strong>
+              </div>
+              <div className="price-stat">
+                <span>Projection:</span>
+                <strong className={priceData.trend_direction === "FALLING" ? "text-danger" : "text-success"}>
+                  ₹{forecastPrice} ({priceData.trend_direction})
+                </strong>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Module 3: Decision Advisor */}
+        <div className="card">
+          <h2>⚖️ 3. Smart Sell/Hold Market Advisor</h2>
+          <p className="card-sub">Synthesize disease severity, weather forecasts, and price trends.</p>
+          
+          <button onClick={handleGetAdvice} className="btn-accent">
+            Consult AI Decision Engine
           </button>
 
           {advisorResult && (
-            <div style={{ marginTop: '20px', padding: '20px', borderRadius: '8px', background: advisorResult.recommendation.includes('SELL') ? '#fef2f2' : '#f0fdf4', border: advisorResult.recommendation.includes('SELL') ? '2px solid #ef4444' : '2px solid #22c55e' }}>
-              <h2 style={{ margin: 0, color: advisorResult.recommendation.includes('SELL') ? '#dc2626' : '#15803d' }}>
-                RECOMMENDATION: {advisorResult.recommendation}
-              </h2>
+            <div className={`advisor-box ${advisorResult.recommendation === "SELL NOW" ? "sell" : "hold"}`}>
+              <div className="advisor-badge">{advisorResult.recommendation}</div>
               <p><strong>Risk Level:</strong> {advisorResult.risk_level}</p>
-              <p><strong>Reasoning:</strong> {advisorResult.reasoning}</p>
+              <p style={{ marginTop: '0.5rem' }}><strong>Reasoning:</strong> {advisorResult.reasoning}</p>
+              
+              {advisorResult.action_steps && (
+                <ul style={{ marginTop: '0.5rem', paddingLeft: '1.2rem' }}>
+                  {advisorResult.action_steps.map((step, i) => (
+                    <li key={i}>{step}</li>
+                  ))}
+                </ul>
+              )}
             </div>
           )}
         </div>
-      )}
 
-      {/* 5. Voice Input Assistant Section */}
-      <div style={{ background: '#fff7ed', padding: '20px', borderRadius: '12px', border: '1px solid #ffedd5' }}>
-        <h2 style={{ color: '#c2410c' }}>🎙️ Voice Assistant Companion</h2>
-        <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-          <input 
-            type="text" 
-            value={chatQuery} 
-            onChange={(e) => setChatQuery(e.target.value)}
-            placeholder="Ask a question or tap voice button..." 
-            style={{ flex: 1, padding: '10px', borderRadius: '6px', border: '1px solid #ccc' }}
-          />
-          <button onClick={() => handleSendMessage()} style={{ padding: '10px 18px', background: '#ea580c', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Ask</button>
-          <button onClick={startVoiceRecognition} style={{ padding: '10px 18px', background: '#0284c7', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>🎤 Speak</button>
-        </div>
-        {chatReply && (
-          <div style={{ marginTop: '15px', background: 'white', padding: '12px', borderRadius: '8px', borderLeft: '4px solid #ea580c' }}>
-            <strong>AI Companion Response:</strong>
-            <p style={{ margin: '5px 0 0 0' }}>{chatReply}</p>
+        {/* Module 4: Conversational Assistant */}
+        <div className="card">
+          <h2>🎤 4. Conversational Voice Companion</h2>
+          <p className="card-sub">Ask crop care or market questions via voice or text input.</p>
+          
+          <div className="voice-actions">
+            <button onClick={handleVoiceQuery} className="btn-voice">
+              🎤 Speak Query
+            </button>
           </div>
-        )}
+
+          <form onSubmit={handleTextChat} className="chat-form">
+            <input 
+              type="text" 
+              placeholder="Ask a farming question..." 
+              value={chatQuery} 
+              onChange={(e) => setChatQuery(e.target.value)}
+              className="chat-input"
+            />
+            <button type="submit" className="btn-primary">Ask</button>
+          </form>
+
+          {chatResponse && (
+            <div className="chat-response-box">
+              <strong>AgriSense Companion:</strong>
+              <p>{chatResponse}</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
+
+export default App;
