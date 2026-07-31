@@ -145,6 +145,7 @@ body {
   border-radius: 8px;
   outline: none;
   font-size: 0.85rem;
+  cursor: pointer;
 }
 
 /* Main Dashboard Wrapper */
@@ -231,6 +232,7 @@ body {
   align-items: center;
   justify-content: center;
   position: relative;
+  flex-shrink: 0;
 }
 
 .gauge-circle::before {
@@ -309,13 +311,6 @@ body {
 .col-span-6 { grid-column: span 6; }
 .col-span-12 { grid-column: span 12; }
 
-@media (max-width: 1024px) {
-  .col-span-7, .col-span-5, .col-span-6 { grid-column: span 12; }
-  .sidebar { width: 80px; }
-  .sidebar .brand-title, .sidebar .nav-item span, .sidebar .lang-selector-box { display: none; }
-  .main-content { margin-left: 80px; }
-}
-
 /* Vision Upload Box */
 .drag-drop-area {
   border: 2px dashed #cbd5e1;
@@ -327,9 +322,10 @@ body {
   transition: all 0.2s;
 }
 
-.drag-drop-area:hover {
+.drag-drop-area:hover, .drag-drop-area:focus {
   border-color: var(--primary-light);
   background: var(--primary-glow);
+  outline: none;
 }
 
 .diagnosis-overlay-container {
@@ -389,6 +385,44 @@ body {
 .btn-agri:hover {
   background: #166534;
   box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
+}
+
+.btn-agri:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Advisor Decision Box */
+.advisor-box {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.advisor-box.sell {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.advisor-box.hold {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+.advisor-badge {
+  display: inline-block;
+  font-weight: 800;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  background: currentColor;
+  color: #ffffff;
 }
 
 /* Voice Visualizer Wave */
@@ -480,4 +514,32 @@ body {
   font-size: 0.8rem;
   color: #111827;
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Native Input Range Override */
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--primary);
+  margin-top: 0.5rem;
+  cursor: pointer;
+}
+
+/* Custom Scrollbar for Chat */
+.chat-window::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-window::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+/* Responsive Overrides */
+@media (max-width: 1024px) {
+  .col-span-7, .col-span-5, .col-span-6 { grid-column: span 12; }
+  .sidebar { width: 80px; padding: 1rem 0.5rem; }
+  .sidebar .brand-title, .sidebar .brand-badge, .sidebar .nav-item span, .sidebar .lang-selector-box { display: none; }
+  .main-content { margin-left: 80px; padding: 1.25rem; }
+  .top-farm-banner { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .health-gauge-card { flex-direction: column; text-align: center; }
 }

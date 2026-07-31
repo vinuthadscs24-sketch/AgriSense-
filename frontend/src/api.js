@@ -1,9 +1,12 @@
+// src/api.js
+
 const API_BASE = "http://localhost:8000";
 
 // 1. Vision AI Diagnosis
-export async function diagnoseCrop(imageFile) {
+export async function diagnoseCrop(imageFile, lang = "en") {
   const formData = new FormData();
   formData.append("image", imageFile); // Matches backend `image: UploadFile = File(...)`
+  formData.append("language", lang);
 
   const res = await fetch(`${API_BASE}/diagnose`, {
     method: "POST",
@@ -11,7 +14,7 @@ export async function diagnoseCrop(imageFile) {
   });
 
   if (!res.ok) {
-    const err = await res.json();
+    const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || "Failed to diagnose crop image");
   }
   return await res.json();
@@ -30,7 +33,7 @@ export async function explainDiagnosis(disease, crop = "Cotton", language = "en"
   });
 
   if (!res.ok) {
-    const err = await res.json();
+    const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || "Failed to explain disease");
   }
   return await res.json();
@@ -38,17 +41,23 @@ export async function explainDiagnosis(disease, crop = "Cotton", language = "en"
 
 // 3. Mandi Market Price Trend
 export async function getPriceTrend(crop) {
-  const res = await fetch(`${API_BASE}/price-trend/${crop}`);
+  const res = await fetch(`${API_BASE}/price-trend/${encodeURIComponent(crop)}`);
 
   if (!res.ok) {
-    const err = await res.json();
+    const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || "Failed to fetch price trend");
   }
   return await res.json();
 }
 
 // 4. Smart Sell/Hold Decision Advisor
-export async function getAdvisorRecommendation(disease, confidence = 0.95, weather = "Moderate Rain expected", priceTrend = "Prices falling", perishability = "High") {
+export async function getAdvisorRecommendation(
+  disease,
+  confidence = 0.95,
+  weather = "Moderate Rain expected",
+  priceTrend = "Prices falling",
+  perishability = "High"
+) {
   const res = await fetch(`${API_BASE}/advisor`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -62,7 +71,7 @@ export async function getAdvisorRecommendation(disease, confidence = 0.95, weath
   });
 
   if (!res.ok) {
-    const err = await res.json();
+    const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || "Failed to fetch advisor decision");
   }
   return await res.json();
@@ -80,13 +89,13 @@ export async function sendChatMessage(message, language = "en") {
   });
 
   if (!res.ok) {
-    const err = await res.json();
+    const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || "Failed to send chat message");
   }
   return await res.json();
 }
 
-// 6. Bonus Feature 1: Yield Loss & Field Health Score
+// 6. Yield Loss & Field Health Score
 export async function getYieldLoss(severityScore = 0.5, affectedPercentage = 25.0) {
   const res = await fetch(`${API_BASE}/yield-loss`, {
     method: "POST",
@@ -98,18 +107,18 @@ export async function getYieldLoss(severityScore = 0.5, affectedPercentage = 25.
   });
 
   if (!res.ok) {
-    const err = await res.json();
+    const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || "Failed to calculate yield loss");
   }
   return await res.json();
 }
 
-// 7. Bonus Feature 2: Community Regional Outbreak Monitor
+// 7. Community Regional Outbreak Monitor
 export async function getCommunityOutbreaks() {
   const res = await fetch(`${API_BASE}/community-outbreaks`);
 
   if (!res.ok) {
-    const err = await res.json();
+    const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || "Failed to fetch regional outbreaks");
   }
   return await res.json();
