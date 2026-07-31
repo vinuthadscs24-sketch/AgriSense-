@@ -48,6 +48,11 @@ class AdvisoryRequest(BaseModel):
 
 class FieldHealthRequest(BaseModel):
     results:list[str]
+
+class TranslateRequest(BaseModel):
+    text:str
+    language:str
+
 # --- API Endpoints ---
 
 @app.get("/")
@@ -194,21 +199,88 @@ async def sell_hold_advisor(data: AdvisoryRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+from collections import Counter
+
 @app.post("/field-health")
-def field_health(data:FieldHealthRequest):
+async def field_health(data: FieldHealthRequest):
+    try:
+        total = len(data.results)
 
-    healthy = data.results.count("Healthy")
+        if total == 0:
+            raise HTTPException(
+                status_code=400,
+                detail="No scan results provided."
+            )
 
-    infected = len(data.results)-healthy
+        healthy = sum(
+            1 for result in data.results
+            if result.lower() == "healthy"
+        )
 
-    score = round((healthy/len(data.results))*100)
+        infected = total - healthy
 
-    return {
+        healthy_percentage = round((healthy / total) * 100, 2)
+        infected_percentage = round((infected / total) * 100, 2)
 
-        "healthy":healthy,
+        diseases = [
+            result for result in data.results
+            if result.lower() != "healthy"
+        ]
 
-        "infected":infected,
+        most_common_disease = (
+            Counter(diseases).most_common(1)[0][0]
+            if diseases else "None"
+        )
 
-        "fieldHealth":score
+        return {
+            "total_scans": total,
+            "healthy_percentage": healthy_percentage,
+            "infected_percentage": infected_percentage,
+            "field_health_score": healthy_percentage,
+            "dominant_disease": most_common_disease,
+            "summary": (
+                f"{healthy_percentage}% healthy, "
+                f"{infected_percentage}% infected. "
+                f"Most common disease: {most_common_disease}."
+            )
+        }
 
-    }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    
+@app.post("/translate")
+async def translate_text(data: TranslateRequest):
+    """
+    Bonus Feature: Multilingual Translation
+    Translates AI responses into the farmer's preferred language.
+    """
+    try:
+        prompt = f"""
+You are a professional translator.
+
+Translate the following text into {data.language}.
+
+Return STRICT JSON format:
+
+{{
+    "language": "{data.language}",
+    "translated_text": ""
+}}
+
+Text:
+{data.text}
+"""
+
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=[prompt],
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json"
+            )
+        )
+
+        return json.loads(response.text)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
