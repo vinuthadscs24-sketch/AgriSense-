@@ -85,3 +85,32 @@ export async function sendChatMessage(message, language = "en") {
   }
   return await res.json();
 }
+
+// 6. Bonus Feature 1: Yield Loss & Field Health Score
+export async function getYieldLoss(severityScore = 0.5, affectedPercentage = 25.0) {
+  const res = await fetch(`${API_BASE}/yield-loss`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      severity_score: severityScore,
+      affected_percentage: affectedPercentage,
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.detail || "Failed to calculate yield loss");
+  }
+  return await res.json();
+}
+
+// 7. Bonus Feature 2: Community Regional Outbreak Monitor
+export async function getCommunityOutbreaks() {
+  const res = await fetch(`${API_BASE}/community-outbreaks`);
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.detail || "Failed to fetch regional outbreaks");
+  }
+  return await res.json();
+}
