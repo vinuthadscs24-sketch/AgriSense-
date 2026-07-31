@@ -137,7 +137,6 @@ def get_weather():
         "humidity": 81,
         "forecast": "Rain expected tomorrow"
     }
-
 @app.get("/market-trend")
 def market_trend():
 
