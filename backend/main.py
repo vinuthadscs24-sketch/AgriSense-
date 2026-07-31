@@ -129,6 +129,30 @@ async def explain_disease(data: DiseaseRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/weather")
+def get_weather():
+    return {
+        "location": "Bangalore",
+        "temperature": 29,
+        "humidity": 81,
+        "forecast": "Rain expected tomorrow"
+    }
+
+@app.get("/market-trend")
+def market_trend():
+
+    current_price = 32
+
+    predicted_price = 35
+
+    trend = "Increasing"
+
+    return {
+        "crop":"Tomato",
+        "current_price":current_price,
+        "predicted_price":predicted_price,
+        "trend":trend
+    }
 
 @app.post("/advisor")
 async def sell_hold_advisor(data: AdvisoryRequest):
