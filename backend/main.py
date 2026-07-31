@@ -160,14 +160,17 @@ async def sell_hold_advisor(data: AdvisoryRequest):
     Synthesizes disease status, weather forecast, price trends, and crop perishability.
     """
     try:
+        weather = get_weather()
+        market = market_trend()
+        
         prompt = f"""
         You are AgriSense, an AI decision engine for smallholder farmers.
         Synthesize the following information to decide whether the farmer should SELL immediately or HOLD their harvest.
         
         Input Context:
         - Disease Detected: {data.disease} (Confidence: {data.confidence})
-        - Weather Forecast: {data.weather}
-        - Market Price Trend: {data.price_trend}
+        - Weather Forecast: {weather['forecast']}
+        - Market Price Trend: {market['trend']}
         - Crop Perishability: {data.perishability}
         
         Return STRICT JSON format with these exact keys:
