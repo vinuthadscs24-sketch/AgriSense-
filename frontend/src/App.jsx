@@ -1,3 +1,16 @@
+import { Analytics } from "@vercel/analytics/react";
+
+function App() {
+  return (
+    <div>
+      {/* Your existing AgriOS Dashboard Code */}
+      
+      <Analytics />
+    </div>
+  );
+}
+
+export default App;
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import { 
