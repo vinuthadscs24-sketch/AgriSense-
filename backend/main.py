@@ -241,6 +241,37 @@ TRANSLATION_SCHEMA = {
     "required": ["language", "translated_text"]
 }
 
+CROP_PRICE_DATA = {
+    "Wheat": [
+        {"day": "Day 1", "price": 2450},
+        {"day": "Day 3", "price": 2410},
+        {"day": "Day 5", "price": 2380},
+        {"day": "Day 7", "price": 2340},
+        {"day": "Next Day 3", "price": 2300}
+    ],
+    "Cotton": [
+        {"day": "Day 1", "price": 6200},
+        {"day": "Day 3", "price": 6250},
+        {"day": "Day 5", "price": 6300},
+        {"day": "Day 7", "price": 6380},
+        {"day": "Next Day 3", "price": 6450}
+    ],
+    "Tomato": [
+        {"day": "Day 1", "price": 1800},
+        {"day": "Day 3", "price": 1750},
+        {"day": "Day 5", "price": 1600},
+        {"day": "Day 7", "price": 1500},
+        {"day": "Next Day 3", "price": 1400}
+    ],
+    "Rice": [
+        {"day": "Day 1", "price": 3100},
+        {"day": "Day 3", "price": 3120},
+        {"day": "Day 5", "price": 3150},
+        {"day": "Day 7", "price": 3180},
+        {"day": "Next Day 3", "price": 3200}
+    ]
+}
+
 
 # ==========================================
 # API Endpoints
@@ -391,6 +422,22 @@ async def get_community_outbreaks(language: str = "en"):
     contents = [prompt]
     res_text = await run_in_threadpool(make_gemini_request, contents, OUTBREAK_SCHEMA)
     return json.loads(res_text)
+
+
+@app.get("/price-trend/{crop}")
+async def get_price_trend(crop: str):
+    crop_name = crop.capitalize()
+    data = CROP_PRICE_DATA.get(crop_name, CROP_PRICE_DATA["Wheat"])
+    
+    first_price = data[0]["price"]
+    last_price = data[-1]["price"]
+    trend_direction = "RISING" if last_price >= first_price else "FALLING"
+
+    return {
+        "crop": crop_name,
+        "trend_direction": trend_direction,
+        "data": data
+    }
 
 
 @app.post("/translate")

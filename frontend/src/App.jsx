@@ -20,7 +20,13 @@ import {
   MessageSquare, 
   Globe, 
   Send,
-  ShieldAlert
+  ShieldAlert,
+  ArrowUpRight,
+  ArrowDownRight,
+  CheckCircle2,
+  AlertTriangle,
+  Sparkles,
+  Cpu
 } from 'lucide-react';
 
 import { 
@@ -46,7 +52,6 @@ const TRANSLATIONS = {
     dashboardSub: "Real-time computer vision, agronomy intelligence, and price forecasting",
     activeField: "Active Field",
     primaryCrop: "Primary Crop",
-    northSector: "North Sector A",
     healthScoreTitle: "Overall Field Health Score",
     healthDefaultSub: "Upload a crop diagnostic photo below to recalculate real-time canopy health.",
     visionTitle: "Vision AI Crop Diagnosis",
@@ -65,9 +70,7 @@ const TRANSLATIONS = {
     synthesizeBtn: "Synthesize Market & Disease Risk",
     riskRating: "Risk Rating",
     waConcept: "📱 AgriOS WhatsApp Broadcast Concept",
-    waDefaultMsg: "AgriOS Advisory Bot: Stripe Rust detected & prices dropping. Heavy rain expected in 48 hrs. Recommendation: SELL NOW to avoid yield degradation.",
     chatPlaceholder: "Ask agronomy or price questions...",
-    chatDefaultGreeting: "Hello! I am your AgriOS companion. Ask me about crop health or market prices.",
     yieldSimulatorTitle: "Canopy Yield Impact Simulator",
     adjustCoverage: "Adjust Affected Canopy Coverage",
     recalculateBtn: "Recalculate Loss Metric",
@@ -92,7 +95,16 @@ const TRANSLATIONS = {
     day3: "Day 3",
     day5: "Day 5",
     day7: "Day 7",
-    nextDay3: "Next Day 3"
+    nextDay3: "Next Day 3",
+    soldToday: "If Sold Today",
+    expAfter3: "Expected (3 Days)",
+    estGainLoss: "Estimated Impact",
+    diseaseRisk: "Disease Risk",
+    marketTrend: "Market Trend",
+    weatherRisk: "Weather Risk",
+    confidence: "Confidence",
+    suggestedQuestions: "Suggested Queries",
+    activeSession: "Active Telemetry Context"
   },
   hi: {
     visionAi: "विजन एआई",
@@ -105,7 +117,6 @@ const TRANSLATIONS = {
     dashboardSub: "वास्तविक समय कंप्यूटर दृष्टि, कृषि विज्ञान ज्ञान और मूल्य पूर्वानुमान",
     activeField: "सक्रिय खेत",
     primaryCrop: "मुख्य फसल",
-    northSector: "उत्तर क्षेत्र ए",
     healthScoreTitle: "कुल खेत स्वास्थ्य स्कोर",
     healthDefaultSub: "कैनोपी स्वास्थ्य की गणना के लिए नीचे फसल फोटो अपलोड करें।",
     visionTitle: "विजन एआई फसल निदान",
@@ -124,9 +135,7 @@ const TRANSLATIONS = {
     synthesizeBtn: "बाजार और बीमारी के जोखिम का विश्लेषण करें",
     riskRating: "जोखिम रेटिंग",
     waConcept: "📱 एग्री-ओएस व्हाट्सएप ब्रॉडकास्ट संदेश",
-    waDefaultMsg: "एग्री-ओएस बॉट: स्ट्राइप रस्ट की पहचान हुई है और कीमतें गिर रही हैं। 48 घंटों में भारी बारिश की उम्मीद है। सिफारिश: नुकसान से बचने के लिए अभी बेचें।",
     chatPlaceholder: "कृषि या मंडी भाव से जुड़े सवाल पूछें...",
-    chatDefaultGreeting: "नमस्ते! मैं आपका एग्री-ओएस साथी हूं। फसल स्वास्थ्य या मंडी भाव के बारे में पूछें।",
     yieldSimulatorTitle: "उपज प्रभाव सिम्युलेटर",
     adjustCoverage: "प्रभावित फसल क्षेत्र समायोजित करें",
     recalculateBtn: "नुकसान की पुनर्गणना करें",
@@ -151,7 +160,16 @@ const TRANSLATIONS = {
     day3: "दिन 3",
     day5: "दिन 5",
     day7: "दिन 7",
-    nextDay3: "अगला दिन 3"
+    nextDay3: "अगला दिन 3",
+    soldToday: "आज बेचने पर",
+    expAfter3: "अनुमानित (3 दिन)",
+    estGainLoss: "अनुमानित प्रभाव",
+    diseaseRisk: "बीमारी का जोखिम",
+    marketTrend: "बाजार रुझान",
+    weatherRisk: "मौसम का जोखिम",
+    confidence: "सटीकता",
+    suggestedQuestions: "सुझाए गए मुख्य प्रश्न",
+    activeSession: "सक्रिय टेलीमेट्री स्थिति"
   },
   kn: {
     visionAi: "ವಿಷನ್ AI",
@@ -164,7 +182,6 @@ const TRANSLATIONS = {
     dashboardSub: "ನೈಜ-ಸಮಯದ ಕಂಪ್ಯೂಟರ್ ವಿಷನ್, ಕೃಷಿ ಜ್ಞಾನ ಮತ್ತು ಬೆಲೆ ಮುನ್ಸೂಚನೆ",
     activeField: "ಸಕ್ರಿಯ ಜಮೀನು",
     primaryCrop: "ಮುಖ್ಯ ಬೆಳೆ",
-    northSector: "ಉತ್ತರ ವಲಯ A",
     healthScoreTitle: "ಒಟ್ಟು ಜಮೀನಿನ ಆರೋಗ್ಯ ಸ್ಕೋರ್",
     healthDefaultSub: "ಆರೋಗ್ಯವನ್ನು ಲೆಕ್ಕಾಚಾರ ಮಾಡಲು ಕೆಳಗೆ ಎಲೆಯ ಫೋಟೋ ಅಪ್ಲೋಡ್ ಮಾಡಿ.",
     visionTitle: "ವಿಷನ್ AI ಬೆಳೆ ರೋಗ ಪತ್ತೆ",
@@ -183,9 +200,7 @@ const TRANSLATIONS = {
     synthesizeBtn: "ಮಾರುಕಟ್ಟೆ ಮತ್ತು ರೋಗದ ಅಪಾಯದ ವಿಶ್ಲೇಷಣೆ",
     riskRating: "ಅಪಾಯದ ಮಟ್ಟ",
     waConcept: "📱 AgriOS ವಾಟ್ಸಾಪ್ ಸಂದೇಶ ಪರಿಕಲ್ಪನೆ",
-    waDefaultMsg: "AgriOS ಬಾಟ್: ಹಳದಿ ರೋಗ ಪತ್ತೆಯಾಗಿದೆ ಮತ್ತು ಬೆಲೆಗಳು ಕುಸಿಯುತ್ತಿವೆ. 48 ಗಂಟೆಗಳಲ್ಲಿ ಭಾರಿ ಮಳೆಯಾಗುವ ಸಾಧ್ಯತೆಯಿದೆ. ಸಲಹೆ: ನಷ್ಟ ತಪ್ಪಿಸಲು ತಕ್ಷಣ ಮಾರಾಟ ಮಾಡಿ.",
     chatPlaceholder: "ಕೃಷಿ ಅಥವಾ ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳ ಬಗ್ಗೆ ಕೇಳಿ...",
-    chatDefaultGreeting: "ನಮಸ್ಕಾರ! ನಾನು ನಿಮ್ಮ ಕೃಷಿ ಸಹಾಯಕ. ಬೆಳೆ ಆರೋಗ್ಯ ಅಥವಾ ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳ ಬಗ್ಗೆ ಕೇಳಿ.",
     yieldSimulatorTitle: "ಇಳುವರಿ ನಷ್ಟದ ಸಿಮ್ಯುಲೇಟರ್",
     adjustCoverage: "ಬಾಧಿತ ಬೆಳೆಯ ಶೇಕಡಾವಾರು ಬದಲಾಯಿಸಿ",
     recalculateBtn: "ಮರು ಲೆಕ್ಕಾಚಾರ ಮಾಡಿ",
@@ -210,7 +225,16 @@ const TRANSLATIONS = {
     day3: "ದಿನ 3",
     day5: "ದಿನ 5",
     day7: "ದಿನ 7",
-    nextDay3: "ಮುಂದಿನ ದಿನ 3"
+    nextDay3: "ಮುಂದಿನ ದಿನ 3",
+    soldToday: "ಇಂದು ಮಾರಾಟ ಮಾಡಿದರೆ",
+    expAfter3: "ನಿರೀಕ್ಷಿತ (3 ದಿನಗಳು)",
+    estGainLoss: "ಅಂದಾಜು ಪರಿಣಾಮ",
+    diseaseRisk: "ರೋಗದ ಅಪಾಯ",
+    marketTrend: "ಮಾರುಕಟ್ಟೆ ಪ್ರವೃತ್ತಿ",
+    weatherRisk: "ಹವಾಮಾನ ಅಪಾಯ",
+    confidence: "ಸರಿಯಾದ ಮಟ್ಟ",
+    suggestedQuestions: "ಶಿಫಾರಸು ಮಾಡಿದ ಪ್ರಶ್ನೆಗಳು",
+    activeSession: "ಸಕ್ರಿಯ ಸನ್ನಿವೇಶದ ಮಾಹಿತಿ"
   }
 };
 
@@ -221,6 +245,23 @@ function App() {
   const [lang, setLang] = useState('en');
   const [activeTab, setActiveTab] = useState('vision');
   
+  // Dynamic Hero & Health State
+  const [userLocation, setUserLocation] = useState('📍 Mysuru District');
+  const [healthTrend, setHealthTrend] = useState({ value: '0%', direction: 'up', color: '#16a34a' });
+  const [diagnosis, setDiagnosis] = useState(null);
+  const [explanation, setExplanation] = useState(null);
+  const [crop, setCrop] = useState('Cotton');
+  const [priceData, setPriceData] = useState(null);
+  const [advisorResult, setAdvisorResult] = useState(null);
+  const [chatQuery, setChatQuery] = useState('');
+  const [chatHistory, setChatHistory] = useState([]);
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef(null);
+  const chatScrollRef = useRef(null);
+  const [yieldData, setYieldData] = useState(null);
+  const [affectedPercent, setAffectedPercent] = useState(20);
+  const [outbreakData, setOutbreakData] = useState(null);
+
   const t = (key) => TRANSLATIONS[lang]?.[key] || TRANSLATIONS['en']?.[key] || key;
 
   const translateStatus = (statusStr) => {
@@ -234,18 +275,7 @@ function App() {
     return statusStr;
   };
 
-  const [diagnosis, setDiagnosis] = useState(null);
-  const [explanation, setExplanation] = useState(null);
-  const [crop, setCrop] = useState('Wheat');
-  const [priceData, setPriceData] = useState(null);
-  const [advisorResult, setAdvisorResult] = useState(null);
-  const [chatQuery, setChatQuery] = useState('');
-  const [chatHistory, setChatHistory] = useState([]);
-  const [isRecording, setIsRecording] = useState(false);
-  const recognitionRef = useRef(null);
-  const [yieldData, setYieldData] = useState(null);
-  const [affectedPercent, setAffectedPercent] = useState(20);
-  const [outbreakData, setOutbreakData] = useState(null);
+  const activeDiseaseName = diagnosis?.disease || "Target Spot";
 
   const scrollToSection = (sectionId) => {
     setActiveTab(sectionId);
@@ -255,7 +285,23 @@ function App() {
     }
   };
 
-  // Inject Google Translate Engine Script automatically for non-listed languages
+  // Live Location Detection
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        try {
+          const { latitude, longitude } = pos.coords;
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`);
+          const geoData = await res.json();
+          const city = geoData.address?.city || geoData.address?.county || geoData.address?.state_district || "Mysuru";
+          setUserLocation(`📍 ${city} District`);
+        } catch (e) {
+          setUserLocation('📍 Mysuru District');
+        }
+      });
+    }
+  }, []);
+
   useEffect(() => {
     const addGoogleTranslateScript = () => {
       if (!document.getElementById('google-translate-script')) {
@@ -275,7 +321,6 @@ function App() {
     addGoogleTranslateScript();
   }, []);
 
-  // Update Google Translate widget when dropdown changes
   const handleLanguageChange = (newLang) => {
     setLang(newLang);
     const selectElem = document.querySelector('.goog-te-combo');
@@ -286,9 +331,10 @@ function App() {
   };
 
   useEffect(() => {
-    setChatHistory([{ sender: 'ai', text: t('chatDefaultGreeting') }]);
+    const contextGreeting = `Hello! I detected ${activeDiseaseName} in your ${crop} crop. Ask me about treatment options, expected yield impact, or market selling strategies.`;
+    setChatHistory([{ sender: 'ai', text: contextGreeting }]);
     fetchOutbreaks(lang);
-  }, [lang]);
+  }, [lang, crop, activeDiseaseName]);
 
   useEffect(() => {
     handleFetchPrice(crop);
@@ -312,19 +358,22 @@ function App() {
     return () => { isMounted = false; };
   }, [lang, diagnosis]);
 
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [chatHistory, isRecording]);
+
   const fetchOutbreaks = async (targetLang = lang) => {
     try {
-      // 1. Request real-time API outbreak data
       const data = await getCommunityOutbreaks(targetLang);
 
-      // 2. Fetch user's live position via Geolocation API
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
           async (position) => {
             const { latitude, longitude } = position.coords;
 
             try {
-              // Geocode latitude & longitude to localized district name
               const geoRes = await fetch(
                 `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
               );
@@ -346,7 +395,6 @@ function App() {
                 ]
               });
             } catch (geoErr) {
-              console.warn("Geocoding failed, falling back to default district:", geoErr);
               setOutbreakData({
                 ...(data || {}),
                 region: data?.region || "Mysuru District / Southern Region",
@@ -357,7 +405,6 @@ function App() {
             }
           },
           (geoErr) => {
-            console.warn("Geolocation permission denied/failed:", geoErr.message);
             setOutbreakData({
               ...(data || {}),
               region: data?.region || "Mysuru District / Southern Region",
@@ -378,7 +425,6 @@ function App() {
       }
     } catch (err) {
       console.error("Outbreak fetch error:", err);
-      // Fallback state on network/API failure
       setOutbreakData({
         region: "Mysuru District / Southern Region",
         active_alerts: [
@@ -421,6 +467,15 @@ function App() {
         const severityScore = diagRes.severity === "High" ? 0.8 : diagRes.severity === "Medium" ? 0.5 : 0.2;
         const lossRes = await getYieldLoss(severityScore, affectedPercent, lang);
         setYieldData(lossRes);
+
+        // Dynamic Trend Direction Badge
+        if (diagRes.severity === "High") {
+          setHealthTrend({ value: '-12% this week', direction: 'down', color: '#dc2626' });
+        } else if (diagRes.severity === "Medium") {
+          setHealthTrend({ value: '-5% this week', direction: 'down', color: '#d97706' });
+        } else {
+          setHealthTrend({ value: '+3% since last scan', direction: 'up', color: '#16a34a' });
+        }
       }
     } catch (err) {
       console.error("Diagnosis error:", err);
@@ -451,22 +506,34 @@ function App() {
 
   const handleGetAdvice = async () => {
     try {
-      const detectedDisease = diagnosis?.disease || "Stripe Rust (Yellow Rust)";
-      const conf = diagnosis?.confidence || 0.94;
-      const trendText = priceData?.trend_direction ? `Prices currently ${priceData.trend_direction}` : "Prices falling";
+      const activeSeverity = diagnosis?.severity || "Medium";
+      const conf = diagnosis?.confidence || 0.92;
+      const currentTrend = priceData?.trend_direction || "RISING";
+      const trendText = `Prices currently ${currentTrend}`;
       
       const res = await getAdvisorRecommendation(
-        detectedDisease,
+        activeDiseaseName,
         conf,
-        "Moderate rain expected within 48 hours",
+        "Optimal weather forecast: Clear skies for next 72 hrs",
         trendText,
-        "High",
+        activeSeverity,
         lang
       );
       setAdvisorResult(res);
     } catch (err) {
       console.error("Advisor error:", err);
       alert(`Advisor Error: ${err.message}`);
+    }
+  };
+
+  const executeChatMessage = async (userText) => {
+    setChatHistory(prev => [...prev, { sender: 'user', text: userText }]);
+    try {
+      const res = await sendChatMessage(userText, lang);
+      setChatHistory(prev => [...prev, { sender: 'ai', text: res.reply }]);
+    } catch (err) {
+      console.error("Chat error:", err);
+      setChatHistory(prev => [...prev, { sender: 'ai', text: "Sorry, I couldn't process that query right now." }]);
     }
   };
 
@@ -487,16 +554,8 @@ function App() {
     recognitionRef.current = recognition;
 
     const langLocales = {
-      hi: 'hi-IN',
-      te: 'te-IN',
-      ta: 'ta-IN',
-      kn: 'kn-IN',
-      mr: 'mr-IN',
-      bn: 'bn-IN',
-      gu: 'gu-IN',
-      pa: 'pa-IN',
-      ml: 'ml-IN',
-      en: 'en-IN'
+      hi: 'hi-IN', te: 'te-IN', ta: 'ta-IN', kn: 'kn-IN', mr: 'mr-IN',
+      bn: 'bn-IN', gu: 'gu-IN', pa: 'pa-IN', ml: 'ml-IN', en: 'en-IN'
     };
     recognition.lang = langLocales[lang] || 'en-IN';
     
@@ -506,13 +565,7 @@ function App() {
     recognition.onresult = async (event) => {
       setIsRecording(false);
       const transcript = event.results[0][0].transcript;
-      setChatHistory(prev => [...prev, { sender: 'user', text: transcript }]);
-      try {
-        const res = await sendChatMessage(transcript, lang);
-        setChatHistory(prev => [...prev, { sender: 'ai', text: res.reply }]);
-      } catch (err) {
-        console.error("Voice chat error:", err);
-      }
+      await executeChatMessage(transcript);
     };
 
     recognition.onerror = () => setIsRecording(false);
@@ -522,25 +575,37 @@ function App() {
   const handleTextChat = async (e) => {
     e.preventDefault();
     if (!chatQuery.trim()) return;
-    
-    const userText = chatQuery;
+    const text = chatQuery;
     setChatQuery('');
-    setChatHistory(prev => [...prev, { sender: 'user', text: userText }]);
-
-    try {
-      const res = await sendChatMessage(userText, lang);
-      setChatHistory(prev => [...prev, { sender: 'ai', text: res.reply }]);
-    } catch (err) {
-      console.error("Text chat error:", err);
-    }
+    await executeChatMessage(text);
   };
 
-  const currentPrice = priceData?.data?.[0]?.price;
-  const chartPoints = Array.isArray(priceData?.data) ? [...priceData.data].reverse() : [];
+  const handleQuickQuestion = async (queryText) => {
+    await executeChatMessage(queryText);
+  };
+
+  // Derived Dynamic Data
+  const activeCropName = crop;
+  const activeSeverity = diagnosis?.severity || "Medium";
+  const activeConfidence = diagnosis?.confidence ? `${(diagnosis.confidence * 100).toFixed(0)}%` : "92%";
+  const currentSpotPrice = priceData?.data?.[0]?.price || 6200;
+  const projectedPrice = priceData?.data?.[priceData.data.length - 1]?.price || 6450;
+  const isPriceRising = (priceData?.trend_direction || "RISING") === "RISING";
+  const priceDiff = projectedPrice - currentSpotPrice;
+  const chartPoints = Array.isArray(priceData?.data) ? priceData.data : [];
+
+  const recBadge = isPriceRising && activeSeverity !== "High" ? "HOLD" : "SELL NOW";
+  const badgeColor = recBadge === "HOLD" ? "#16a34a" : "#dc2626";
+  const badgeBg = recBadge === "HOLD" ? "#dcfce7" : "#fee2e2";
+
+  const quickQuestions = [
+    `How to treat ${activeDiseaseName}?`,
+    `Should I sell ${activeCropName} today?`,
+    `Will rain affect ${activeCropName}?`
+  ];
 
   return (
     <div className="agri-os-layout">
-      {/* Hidden Google Translate Widget */}
       <div id="google_translate_element" style={{ display: 'none' }}></div>
 
       {/* Sidebar Navigation */}
@@ -590,7 +655,7 @@ function App() {
         </div>
       </aside>
 
-      {/* Main Area */}
+      {/* Main Content Area */}
       <main className="main-content">
         <header className="top-farm-banner">
           <div className="banner-title">
@@ -600,7 +665,7 @@ function App() {
           <div className="farm-metrics-pills">
             <div className="metric-pill">
               <span>{t('activeField')}</span>
-              <strong>{t('northSector')}</strong>
+              <strong>{userLocation}</strong>
             </div>
             <div className="metric-pill">
               <span>{t('primaryCrop')}</span>
@@ -609,16 +674,45 @@ function App() {
           </div>
         </header>
 
-        {/* Global Field Health Bar */}
-        <div id="health" className="health-gauge-card" style={{ '--health-pct': `${yieldData?.field_health_score || 89}%` }}>
-          <div className="gauge-circle">
-            <span className="gauge-value">{yieldData ? yieldData.field_health_score : 89}%</span>
+        {/* Dynamic Field Health Score Bar */}
+        <div 
+          id="health" 
+          className="health-gauge-card" 
+          style={{ 
+            '--health-pct': `${yieldData ? yieldData.field_health_score : 100}%`,
+            position: 'relative',
+            overflow: 'visible'
+          }}
+        >
+          {/* Tooltip Wrapper */}
+          <div className="relative inline-block group/circle" style={{ overflow: 'visible' }}>
+            <div className="gauge-circle cursor-pointer">
+              <span className="gauge-value">
+                {yieldData ? `${yieldData.field_health_score}%` : '--'}
+              </span>
+            </div>
+
+            {/* Positioned Hover Tooltip */}
+            <div className="absolute top-full left-0 mt-2 hidden group-hover/circle:flex flex-col gap-1 bg-slate-900 text-white text-xs p-3 rounded-lg shadow-xl z-50 w-48 border border-slate-700 pointer-events-none">
+              <div className="font-semibold text-slate-300 border-b border-slate-700 pb-1 mb-1">Diagnostic Metrics</div>
+              <div className="flex justify-between"><span>Severity:</span> <strong className="text-amber-400">{diagnosis?.severity || 'N/A'}</strong></div>
+              <div className="flex justify-between"><span>Canopy Impact:</span> <strong>{affectedPercent}%</strong></div>
+              <div className="flex justify-between"><span>Est. Yield Loss:</span> <strong className="text-red-400">~{yieldData?.estimated_yield_loss_percent || 0}%</strong></div>
+            </div>
           </div>
+
           <div className="gauge-details">
-            <h3>{t('healthScoreTitle')}</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <h3>{t('healthScoreTitle')}</h3>
+              {yieldData && (
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: healthTrend.color, background: '#f1f5f9', padding: '2px 8px', borderRadius: '12px' }}>
+                  {healthTrend.direction === 'up' ? '↑' : '↓'} {healthTrend.value}
+                </span>
+              )}
+            </div>
             <p>
               {yieldData 
-                ? `${t('yieldLossPrefix')}: ~${yieldData.estimated_yield_loss_percent}%. ${t('statusPrefix')}: ${yieldData.status}`
+                ? `Field health updated using AI disease analysis (${activeDiseaseName}) and canopy impact estimation.`
                 : t('healthDefaultSub')}
             </p>
           </div>
@@ -688,8 +782,8 @@ function App() {
             <div className="card-header-flex">
               <h2><TrendingUp size={20} /> {t('mandiTitle')}</h2>
               <select value={crop} onChange={(e) => setCrop(e.target.value)} className="lang-select" style={{ width: 'auto', background: '#f8fafc', color: '#0f172a', borderColor: '#cbd5e1' }}>
-                <option value="Wheat">{t('cropWheat')}</option>
                 <option value="Cotton">{t('cropCotton')}</option>
+                <option value="Wheat">{t('cropWheat')}</option>
                 <option value="Tomato">{t('cropTomato')}</option>
                 <option value="Rice">{t('cropRice')}</option>
               </select>
@@ -705,11 +799,10 @@ function App() {
                        pt.day === 'Day 7' ? t('day7') : 
                        pt.day === 'Next Day 3' ? t('nextDay3') : pt.day
                 })) : [
-                  { day: t('day1'), price: 2450 },
-                  { day: t('day3'), price: 2410 },
-                  { day: t('day5'), price: 2380 },
-                  { day: t('day7'), price: 2340 },
-                  { day: t('nextDay3'), price: 2300 },
+                  { day: t('day1'), price: 6150 },
+                  { day: t('day3'), price: 6200 },
+                  { day: t('day5'), price: 6350 },
+                  { day: t('day7'), price: 6450 }
                 ]}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                   <XAxis dataKey="day" tick={{ fontSize: 11 }} />
@@ -722,8 +815,8 @@ function App() {
 
             {priceData && (
               <div style={{ display: 'flex', justifyContent: 'space-between', background: '#f8fafc', padding: '0.75rem', borderRadius: '10px', marginTop: '0.5rem', fontSize: '0.85rem' }}>
-                <span>{t('spotPrice')}: <strong>₹{currentPrice}/qtl</strong></span>
-                <span>{t('trend')}: <strong style={{ color: priceData.trend_direction === 'FALLING' ? '#dc2626' : '#16a34a' }}>{translateStatus(priceData.trend_direction)}</strong></span>
+                <span>{t('spotPrice')}: <strong>₹{currentSpotPrice}/qtl</strong></span>
+                <span>{t('trend')}: <strong style={{ color: isPriceRising ? '#16a34a' : '#dc2626' }}>{translateStatus(priceData.trend_direction)}</strong></span>
               </div>
             )}
             
@@ -738,58 +831,168 @@ function App() {
               <h2><Scale size={20} /> {t('advisorTitle')}</h2>
             </div>
             
-            <button onClick={handleGetAdvice} className="btn-agri" style={{ background: '#7c3aed' }}>
+            <button onClick={handleGetAdvice} className="btn-agri" style={{ background: '#7c3aed', marginBottom: '1rem' }}>
               {t('synthesizeBtn')}
             </button>
 
-            {advisorResult ? (
-              <div className={`advisor-box ${advisorResult.recommendation?.includes("SELL") ? "sell" : "hold"}`}>
-                <div className="advisor-badge">{advisorResult.recommendation}</div>
-                <p><strong>{t('riskRating')}:</strong> {translateStatus(advisorResult.risk_level)}</p>
-                <p style={{ marginTop: '0.4rem' }}>{advisorResult.reasoning}</p>
-                {advisorResult.whatsapp_broadcast && (
-                  <div style={{ marginTop: '0.6rem', fontSize: '0.8rem', opacity: 0.9 }}>
-                    💬 {advisorResult.whatsapp_broadcast}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="whatsapp-card" style={{ marginTop: '1rem' }}>
-                <div className="wa-header">
-                  <span>{t('waConcept')}</span>
-                  <span>{t('live')}</span>
-                </div>
-                <div className="wa-bubble">
-                  {t('waDefaultMsg')}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: badgeBg, padding: '0.75rem 1rem', borderRadius: '12px', marginBottom: '1rem' }}>
+              <div>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#475569', textTransform: 'uppercase' }}>AI Recommendation</span>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: badgeColor, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  {recBadge === "HOLD" ? <CheckCircle2 size={24} /> : <AlertTriangle size={24} />}
+                  {recBadge === "HOLD" ? "🟢 HOLD (3–5 Days)" : "🔴 SELL NOW"}
                 </div>
               </div>
-            )}
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Active Session</span>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#0f172a' }}>{activeCropName}</div>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', background: '#f8fafc', padding: '0.75rem', borderRadius: '10px', marginBottom: '1rem', fontSize: '0.8rem' }}>
+              <div><span style={{ color: '#64748b' }}>{t('diseaseRisk')}:</span> <strong>{translateStatus(activeSeverity)}</strong></div>
+              <div><span style={{ color: '#64748b' }}>{t('marketTrend')}:</span> <strong>{translateStatus(priceData?.trend_direction || 'RISING')}</strong></div>
+              <div><span style={{ color: '#64748b' }}>{t('weatherRisk')}:</span> <strong>{translateStatus('LOW RISK')}</strong></div>
+              <div><span style={{ color: '#64748b' }}>{t('confidence')}:</span> <strong>{activeConfidence}</strong></div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem', textAlign: 'center', background: '#ffffff', border: '1px solid #e2e8f0', padding: '0.75rem', borderRadius: '10px', marginBottom: '1rem' }}>
+              <div>
+                <div style={{ fontSize: '0.7rem', color: '#64748b' }}>{t('soldToday')}</div>
+                <div style={{ fontSize: '0.95rem', fontWeight: 700 }}>₹{currentSpotPrice}/qtl</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.7rem', color: '#64748b' }}>{t('expAfter3')}</div>
+                <div style={{ fontSize: '0.95rem', fontWeight: 700 }}>₹{projectedPrice}/qtl</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.7rem', color: '#64748b' }}>{t('estGainLoss')}</div>
+                <div style={{ fontSize: '0.95rem', fontWeight: 800, color: priceDiff >= 0 ? '#16a34a' : '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px' }}>
+                  {priceDiff >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                  {priceDiff >= 0 ? `+₹${priceDiff}` : `-₹${Math.abs(priceDiff)}`}/qtl
+                </div>
+              </div>
+            </div>
+
+            <div className="whatsapp-card">
+              <div className="wa-header">
+                <span>{t('waConcept')}</span>
+                <span>{t('live')}</span>
+              </div>
+              <div className="wa-bubble" style={{ whiteSpace: 'pre-line', lineHeight: '1.4' }}>
+                📢 <strong>AgriOS Alert</strong>
+                {"\n\n"}
+                <strong>Crop:</strong> {activeCropName}
+                {"\n"}
+                <strong>Disease:</strong> {activeDiseaseName}
+                {"\n"}
+                <strong>Severity:</strong> {activeSeverity}
+                {"\n\n"}
+                📈 {activeCropName} market prices are forecast to {isPriceRising ? 'rise' : 'drop'} over the next 3 days.
+                {"\n\n"}
+                <strong>Recommendation:</strong>
+                {"\n"}
+                {recBadge === "HOLD" 
+                  ? "Hold for 3–5 days while applying fungicide and monitoring spread." 
+                  : "Sell immediately to mitigate yield degradation risks."}
+                {"\n\n"}
+                <strong>Confidence:</strong> {activeConfidence}
+              </div>
+            </div>
           </div>
 
           {/* Module 4: Voice Assistant */}
-          <div id="voice" className="os-card col-span-6">
-            <div className="card-header-flex">
-              <h2><Mic size={20} /> {t('voiceAssistant')}</h2>
-            </div>
-
-            <div className="chat-window">
-              {chatHistory.map((msg, index) => (
-                <div key={index} className={`chat-msg ${msg.sender}`}>
-                  {msg.text}
-                </div>
-              ))}
-            </div>
-
-            {isRecording && (
-              <div className="voice-wave-container">
-                <div className="wave-bar"></div>
-                <div className="wave-bar"></div>
-                <div className="wave-bar"></div>
-                <div className="wave-bar"></div>
+          <div 
+            id="voice" 
+            className="os-card col-span-6" 
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              justifySpace: 'space-between',
+              height: '100%'
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+              <div className="card-header-flex">
+                <h2><Mic size={20} /> {t('voiceAssistant')}</h2>
+                <span style={{ fontSize: '0.75rem', background: '#fce7f3', color: '#be185d', padding: '2px 8px', borderRadius: '12px', fontWeight: 600 }}>
+                  NLP Active
+                </span>
               </div>
-            )}
 
-            <form onSubmit={handleTextChat} style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
+              {/* Context Telemetry Chip */}
+              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '6px 10px', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600, color: '#475569' }}>
+                  <Cpu size={14} color="#0284c7" /> {t('activeSession')}
+                </span>
+                <span style={{ color: '#0f172a', fontWeight: 700 }}>
+                  {activeCropName} • {activeDiseaseName}
+                </span>
+              </div>
+
+              {/* Chat Stream */}
+              <div 
+                className="chat-window" 
+                ref={chatScrollRef} 
+                style={{ 
+                  flex: '1 1 auto', 
+                  minHeight: '120px', 
+                  maxHeight: '360px', 
+                  overflowY: 'auto', 
+                  paddingRight: '4px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.5rem'
+                }}
+              >
+                {chatHistory.map((msg, index) => (
+                  <div key={index} className={`chat-msg ${msg.sender}`}>
+                    {msg.text}
+                  </div>
+                ))}
+              </div>
+
+              {isRecording && (
+                <div className="voice-wave-container" style={{ margin: '0.5rem 0' }}>
+                  <div className="wave-bar"></div>
+                  <div className="wave-bar"></div>
+                  <div className="wave-bar"></div>
+                  <div className="wave-bar"></div>
+                </div>
+              )}
+
+              {/* Inline Suggestions */}
+              <div style={{ paddingTop: '0.5rem', marginBottom: '0.5rem' }}>
+                <div style={{ fontSize: '0.7rem', fontWeight: 600, color: '#64748b', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Sparkles size={12} color="#7c3aed" /> {t('suggestedQuestions')}
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
+                  {quickQuestions.map((qText, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleQuickQuestion(qText)}
+                      style={{
+                        background: '#f1f5f9',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '14px',
+                        padding: '3px 8px',
+                        fontSize: '0.72rem',
+                        color: '#334155',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseOver={(e) => { e.currentTarget.style.background = '#e2e8f0'; }}
+                      onMouseOut={(e) => { e.currentTarget.style.background = '#f1f5f9'; }}
+                    >
+                      • {qText}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Fixed Input Controls */}
+            <form onSubmit={handleTextChat} style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
               <input 
                 type="text" 
                 placeholder={t('chatPlaceholder')} 
@@ -797,7 +1000,11 @@ function App() {
                 onChange={(e) => setChatQuery(e.target.value)}
                 style={{ flex: 1, padding: '0.6rem 0.8rem', borderRadius: '10px', border: '1px solid #cbd5e1', outline: 'none' }}
               />
-              <button type="button" onClick={handleVoiceQuery} style={{ background: isRecording ? '#dc2626' : '#ec4899', color: '#fff', border: 'none', padding: '0.6rem 0.8rem', borderRadius: '10px', cursor: 'pointer' }}>
+              <button 
+                type="button" 
+                onClick={handleVoiceQuery} 
+                style={{ background: isRecording ? '#dc2626' : '#ec4899', color: '#fff', border: 'none', padding: '0.6rem 0.8rem', borderRadius: '10px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
                 <Mic size={18} />
               </button>
               <button type="submit" className="btn-agri" style={{ width: 'auto', padding: '0.6rem 1rem' }}>
@@ -821,37 +1028,50 @@ function App() {
               max="100" 
               value={affectedPercent} 
               onChange={(e) => setAffectedPercent(Number(e.target.value))}
+              style={{ width: '100%', accentColor: '#16a34a', marginBottom: '1rem' }}
             />
-            <button onClick={handleRecalculateYield} className="btn-agri" style={{ marginTop: '0.5rem', background: '#15803d' }}>
+
+            <button onClick={handleRecalculateYield} className="btn-agri" style={{ background: '#059669' }}>
               {t('recalculateBtn')}
             </button>
+
+            {yieldData && (
+              <div style={{ marginTop: '1rem', background: '#f8fafc', padding: '0.85rem', borderRadius: '10px', fontSize: '0.85rem' }}>
+                <p><strong>{t('yieldLossPrefix')}:</strong> ~{yieldData.estimated_yield_loss_percent}%</p>
+                <p style={{ marginTop: '0.3rem' }}><strong>{t('statusPrefix')}:</strong> {translateStatus(yieldData.status)}</p>
+              </div>
+            )}
           </div>
 
           {/* Module 6: Regional Outbreak Radar */}
           <div className="os-card col-span-6">
             <div className="card-header-flex">
-              <h2><ShieldAlert size={20} color="#dc2626" /> {t('outbreakRadarTitle')}</h2>
+              <h2><ShieldAlert size={20} /> {t('outbreakRadarTitle')}</h2>
             </div>
 
             {outbreakData ? (
               <div>
-                <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.5rem' }}>
+                <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '0.75rem' }}>
                   {t('regionLabel')}: <strong>{outbreakData.region}</strong>
                 </p>
-                {outbreakData.active_alerts?.map((alertItem, idx) => (
-                  <div key={idx} style={{ background: '#fef2f2', border: '1px solid #fecaca', padding: '0.6rem', borderRadius: '8px', marginBottom: '0.4rem', fontSize: '0.82rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#991b1b', fontWeight: 700 }}>
-                      <span>{t(`crop${alertItem.crop}`) || alertItem.crop} - {alertItem.disease}</span>
-                      <span>{translateStatus(alertItem.risk_level)}</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {outbreakData.active_alerts?.map((alertItem, idx) => (
+                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fef2f2', borderLeft: '4px solid #ef4444', padding: '0.6rem 0.8rem', borderRadius: '6px' }}>
+                      <div>
+                        <strong style={{ fontSize: '0.9rem', color: '#991b1b' }}>{alertItem.crop} - {alertItem.disease}</strong>
+                        <div style={{ fontSize: '0.75rem', color: '#7f1d1d' }}>
+                          {alertItem.cases_reported} {t('reportsWithin')} {alertItem.distance_km} {t('radius')}
+                        </div>
+                      </div>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#dc2626', background: '#fee2e2', padding: '2px 6px', borderRadius: '4px' }}>
+                        {translateStatus(alertItem.risk_level)}
+                      </span>
                     </div>
-                    <span style={{ color: '#4b5563', fontSize: '0.78rem' }}>
-                      {alertItem.cases_reported} {t('reportsWithin')} {alertItem.distance_km} {t('radius')}
-                    </span>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             ) : (
-              <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{t('loadingOutbreaks')}</p>
+              <p style={{ fontSize: '0.85rem', color: '#64748b' }}>{t('loadingOutbreaks')}</p>
             )}
           </div>
 
